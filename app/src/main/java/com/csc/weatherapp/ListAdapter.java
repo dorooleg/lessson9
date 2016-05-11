@@ -1,10 +1,13 @@
 package com.csc.weatherapp;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,18 +51,28 @@ public class ListAdapter extends CursorAdapter {
         tvTemp.setText(temp);
         final int id = cursor.getInt(cursor.getColumnIndex(FeedsTable._ID));
 
-
-        flItemList.setOnClickListener(new View.OnClickListener() {
+        flItemList.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(name);
                 builder.setPositiveButton(context.getString(R.string.open), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(activity.getContext(), DescriptionCityActivity.class);
-                        intent.putExtra("CITY_ID", Integer.toString(city_id));
-                        activity.startActivity(intent);
+                        if (activity.getActivity().findViewById(R.id.fragment_description) == null) {
+                            Intent intent = new Intent(activity.getContext(), DescriptionCityActivity.class);
+                            intent.putExtra("CITY_ID", Integer.toString(city_id));
+                            activity.startActivity(intent);
+                        } else {
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("CITY_ID", city_id);
+                            DescriptionCityFragment fDescription = new DescriptionCityFragment();
+                            fDescription.setArguments(bundle);
+                            activity.getFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_description, fDescription)
+                                    .commit();
+                        }
                     }
                 });
                 builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -77,6 +90,26 @@ public class ListAdapter extends CursorAdapter {
                 });
 
                 builder.show();
+                return true;
+            }
+        });
+        flItemList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (activity.getActivity().findViewById(R.id.fragment_description) == null) {
+                    Intent intent = new Intent(activity.getContext(), DescriptionCityActivity.class);
+                    intent.putExtra("CITY_ID", Integer.toString(city_id));
+                    activity.startActivity(intent);
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("CITY_ID", city_id);
+                    DescriptionCityFragment fDescription = new DescriptionCityFragment();
+                    fDescription.setArguments(bundle);
+                    activity.getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_description, fDescription)
+                            .commit();
+                }
             }
         });
 

@@ -12,6 +12,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -29,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             addNewFragment();
+        }
+        if (findViewById(R.id.fragment_description) != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_description, new DescriptionCityFragment())
+                    .commit();
         }
         restartNotify();
 
@@ -96,14 +103,13 @@ public class MainActivity extends AppCompatActivity {
     AlarmManager am;
     private void restartNotify() {
         am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, TimeNotification.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
-                intent, PendingIntent.FLAG_CANCEL_CURRENT );
-// На случай, если мы ранее запускали активити, а потом поменяли время,
-// откажемся от уведомления
-        am.cancel(pendingIntent);
-// Устанавливаем разовое напоминание
-        am.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), 1000 * 60 * 60, pendingIntent);
+        if (am != null) {
+            Intent intent = new Intent(this, TimeNotification.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
+                    intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            am.cancel(pendingIntent);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), 1000 * 60 * 60, pendingIntent);
+        }
     }
 
 }

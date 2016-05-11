@@ -10,10 +10,11 @@ public class TimeNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
-        {
-            WeatherTask task = new WeatherTask(context.getContentResolver());
-            task.execute();
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+                WeatherTask task = new WeatherTask(context.getContentResolver());
+                task.execute();
+            }
         }
     }
 }
